@@ -4,7 +4,7 @@ Overview
 
 - End-to-end Retrieval-Augmented Generation (RAG) to assist CloudSync support agents.
 - Sources: product_docs.json (7 docs) and support_tickets.json (8 tickets).
-- Vector DB: ChromaDB (persistent) with Sentence-Transformers (default) or OpenAI embeddings.
+- Vector DB: ChromaDB (persistent) with Sentence-Transformers (default).
 - Hybrid retrieval: semantic (vector) + BM25 keyword, re-ranked by doc type, recency, version awareness, and light intent rules.
 - Response generation: clear steps/bullets, citations (title/ID/section/version), confidence; flags version mismatch/outdated/conflicts.
 - FastAPI backend + attractive web frontend for query, DB inspection, trace, and evaluation.
@@ -14,7 +14,7 @@ Requirements checklist
 - Part 1: Document Processing & Indexing
   - [x] Load/parse both JSON files
   - [x] Intelligent chunking preserving lists/steps/sections and metadata
-  - [x] Real embeddings (Sentence-Transformers default; OpenAI optional)
+  - [x] Real embeddings (Sentence-Transformers default)
   - [x] Persistent vector database (ChromaDB)
 - Part 2: Smart Retrieval System
   - [x] Hybrid retrieval (semantic + BM25)
@@ -40,13 +40,16 @@ Quickstart
 2. Install dependencies (internet required first time):
    pip install -r requirements.txt
    pip install fastapi uvicorn[standard]
+
 3. CLI usage
-   - Build index & query (JSON):
-     python cli.py query --rebuild-index --json "How do I share folders with other people?"
-   - Evaluate (JSON):
-     python cli.py eval --rebuild-index --json
+
+   - Build index & query (JSON): python cli.py query --rebuild-index --json "How do I share folders with other people?"
+
+   - Evaluate (JSON): python cli.py eval --rebuild-index --json
+
 4. Start API + frontend
-   uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+   Command : uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+
    Open http://localhost:8000 (frontend) and http://localhost:8000/docs (API docs)
 
 Frontend features (web/)
@@ -125,10 +128,3 @@ Work log (high level)
 - FastAPI API and Bootstrap frontend with interactive panels
 - Fixed confidence edge case (no more zero for borderline matches)
 - Wrote/verified unit tests; evaluation: 12/12 passing
-
-Limitations & next steps
-
-- Classifier is rule-based; can be replaced with ML classifier if labeled data available.
-- Add a cross-encoder re-ranker for improved precision on hard queries.
-- Optional streaming answers via Server-Sent Events (SSE) for long responses.
-- Expand tests to cover generator formatting and API endpoints.

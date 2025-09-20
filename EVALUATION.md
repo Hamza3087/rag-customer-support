@@ -37,16 +37,9 @@ Evidence & commands
 
 - Sample query (JSON answer):
   python cli.py query --json "How do I share folders with other people?"
+
 - Database inspection:
   python cli.py db stats
-  python cli.py db list --limit 5 --where '{"source":"doc"}'
-  python cli.py db show --id "doc_004:::..."
+ 
 - Retrieval trace (semantic/BM25/combined):
   python cli.py trace "How do I share folders with other people?" --top-k 6 > trace.json
-
-Limitations & future work
-
-- Classifier is rule-based; can be made ML-based if labeled data becomes available.
-- A cross-encoder re-ranker can further improve ranking on borderline cases.
-- Add streaming answers via SSE and auth for multi-user deployments.
-- Extend unit tests to cover API endpoints and generator formatting paths.
