@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CloudSync RAG Console</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="/static/styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#"
+          ><i class="bi bi-cloud"></i> CloudSync RAG</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarsExampleDefault"
+          aria-controls="navbarsExampleDefault"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" href="#tab-query"
+                >Query</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-db"
+                >Database</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-trace"
+                >Trace</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#tab-eval"
+                >Evaluate</a
+              >
+            </li>
+          </ul>
+          <span id="health-indicator" class="badge bg-secondary"
+            >checking…</span
+          >
+        </div>
+      </div>
+    </nav>
+
+    <main class="container my-4">
+      <div class="tab-content">
+        <!-- Query -->
+        <div class="tab-pane fade show active" id="tab-query">
+          <div class="card shadow-sm">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="bi bi-search"></i>
+              <span class="fw-semibold">Ask a question</span>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">Query</label>
+                <textarea
+                  id="q-text"
+                  class="form-control"
+                  rows="3"
+                  placeholder="e.g., What are the differences between Free and Pro accounts?"
+                ></textarea>
+              </div>
+              <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                  <label for="q-topk" class="col-form-label">Top K</label>
+                </div>
+                <div class="col-auto">
+                  <input
+                    id="q-topk"
+                    type="number"
+                    class="form-control"
+                    min="1"
+                    max="12"
+                    value="6"
+                  />
+                </div>
+                <div class="col-auto form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="q-rebuild"
+                  />
+                  <label class="form-check-label" for="q-rebuild"
+                    >Rebuild index</label
+                  >
+                </div>
+                <div class="col-auto">
+                  <button id="btn-ask" class="btn btn-primary">
+                    <i class="bi bi-send"></i> Ask
+                  </button>
+                </div>
+              </div>
+              <hr />
+              <pre id="q-output" class="pretty"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DB -->
+        <div class="tab-pane fade" id="tab-db">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card shadow-sm h-100">
+                <div class="card-header">
+                  <i class="bi bi-database"></i> Stats
+                </div>
+                <div class="card-body">
+                  <button
+                    id="btn-db-stats"
+                    class="btn btn-outline-primary btn-sm"
+                  >
+                    <i class="bi bi-arrow-repeat"></i> Refresh
+                  </button>
+                  <pre id="db-stats" class="pretty mt-3"></pre>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="card shadow-sm h-100">
+                <div class="card-header">
+                  <i class="bi bi-list-ul"></i> List chunks
+                </div>
+                <div class="card-body">
+                  <div class="row g-2 mb-2">
+                    <div class="col-auto">
+                      <input
+                        id="db-limit"
+                        type="number"
+                        class="form-control form-control-sm"
+                        value="5"
+                        min="1"
+                        max="50"
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        id="db-where"
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder='{"source":"doc"}'
+                      />
+                    </div>
+                    <div class="col-auto">
+                      <button
+                        id="btn-db-list"
+                        class="btn btn-outline-secondary btn-sm"
+                      >
+                        List
+                      </button>
+                    </div>
+                  </div>
+                  <pre id="db-list" class="pretty"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card shadow-sm mt-3">
+            <div class="card-header">
+              <i class="bi bi-search"></i> Show chunk
+            </div>
+            <div class="card-body">
+              <div class="input-group input-group-sm mb-2">
+                <span class="input-group-text">ID</span>
+                <input
+                  id="db-id"
+                  type="text"
+                  class="form-control"
+                  placeholder="doc_004:::..."
+                />
+                <button id="btn-db-show" class="btn btn-outline-secondary">
+                  Show
+                </button>
+              </div>
+              <pre id="db-show" class="pretty"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trace -->
+        <div class="tab-pane fade" id="tab-trace">
+          <div class="card shadow-sm">
+            <div class="card-header">
+              <i class="bi bi-diagram-3"></i> Trace retrieval
+            </div>
+            <div class="card-body">
+              <div class="row g-2 mb-2">
+                <div class="col">
+                  <input
+                    id="t-text"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter a query to trace"
+                  />
+                </div>
+                <div class="col-auto">
+                  <input
+                    id="t-topk"
+                    type="number"
+                    class="form-control"
+                    value="6"
+                    min="1"
+                    max="20"
+                  />
+                </div>
+                <div class="col-auto">
+                  <button id="btn-trace" class="btn btn-outline-primary">
+                    <i class="bi bi-play-circle"></i> Trace
+                  </button>
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card border-0 bg-light">
+                    <div class="card-header bg-transparent">
+                      <strong>Semantic</strong>
+                    </div>
+                    <div class="card-body">
+                      <pre id="t-sem" class="pretty"></pre>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card border-0 bg-light">
+                    <div class="card-header bg-transparent">
+                      <strong>BM25</strong>
+                    </div>
+                    <div class="card-body">
+                      <pre id="t-bm25" class="pretty"></pre>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="card border-0 bg-light">
+                    <div class="card-header bg-transparent">
+                      <strong>Combined</strong>
+                    </div>
+                    <div class="card-body">
+                      <pre id="t-combined" class="pretty"></pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Eval -->
+        <div class="tab-pane fade" id="tab-eval">
+          <div class="card shadow-sm">
+            <div class="card-header">
+              <i class="bi bi-clipboard-check"></i> Evaluation
+            </div>
+            <div class="card-body">
+              <div class="form-check form-switch mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="e-rebuild"
+                />
+                <label class="form-check-label" for="e-rebuild"
+                  >Rebuild index</label
+                >
+              </div>
+              <button id="btn-eval" class="btn btn-success">
+                <i class="bi bi-rocket"></i> Run Evaluation
+              </button>
+              <pre id="eval-out" class="pretty mt-3"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
